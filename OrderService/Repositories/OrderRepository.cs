@@ -1,5 +1,4 @@
-﻿
-namespace Infrastructure.Repositories
+﻿namespace OrderService.Repositories
 {
     public class OrderRepository
     {

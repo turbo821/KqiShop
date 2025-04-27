@@ -2,7 +2,7 @@ syntax = "proto3";
 
 option csharp_namespace = "ProductService";
 
-package greet;
+package product;
 
 service ProductGrpc {
   rpc GetProduct (GetProductRequest) returns (GetProductResponse);
@@ -30,8 +30,8 @@ message AddProductRequest {
 }
 
 message AddProductResponse {
-	int32 id = 1;
-	bool success = 2;
+  int32 id = 1;
+  bool success = 2;
 }
 
 message UpdateProductStockRequest {
@@ -41,5 +41,5 @@ message UpdateProductStockRequest {
 
 message UpdateProductStockResponse {
   bool success = 1;
-  int32 newStock = 2;
+  int32 new_stock = 2;
 }
