@@ -1,7 +1,12 @@
 ﻿
-namespace Domain.Interfaces
+using OrderService.Models;
+
+namespace OrderService.Interfaces
 {
-    internal interface IOrderRepository
+    public interface IOrderRepository
     {
+        Task<int> AddAsync(Order order);
+        Task UpdateStatusAsync(int orderId, OrderStatus status);
+        Task<Order?> GetByIdAsync(int id);
     }
 }

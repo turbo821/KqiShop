@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "OrderService";
+option csharp_namespace = "OrderService.Client";
 
 import "google/protobuf/timestamp.proto";
 

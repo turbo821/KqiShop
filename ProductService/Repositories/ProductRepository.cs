@@ -1,4 +1,4 @@
-﻿using Infrastructure.Data;
+﻿using OrderService.Data;
 using Microsoft.EntityFrameworkCore;
 using ProductService.Interfaces;
 using ProductService.Models;
@@ -37,7 +37,7 @@ namespace ProductService.Repositories
 
             if(product is null) return null;
 
-            product.Stock = stock;
+            product.Stock += stock;
 
             var success = await _context.SaveChangesAsync();
 

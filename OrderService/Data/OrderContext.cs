@@ -1,8 +1,7 @@
-﻿using ProductService.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using OrderService.Models;
 
-namespace Infrastructure.Data
+namespace OrderService.Data
 {
     public class OrderContext(DbContextOptions<OrderContext> options)
         : DbContext(options)
