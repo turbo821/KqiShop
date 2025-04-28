@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "ProductService.Client";
+option csharp_namespace = "ApiGateway.Infrastructure.Protos";
 
 package product;
 
@@ -8,6 +8,7 @@ service ProductGrpc {
   rpc GetProduct (GetProductRequest) returns (GetProductResponse);
   rpc AddProduct (AddProductRequest) returns (AddProductResponse);
   rpc UpdateProductStock (UpdateProductStockRequest) returns (UpdateProductStockResponse);
+  rpc CheckProductStock (GetProductRequest) returns (CheckProductStockResponse);
 }
 
 message GetProductRequest {
@@ -36,10 +37,14 @@ message AddProductResponse {
 
 message UpdateProductStockRequest {
   int32 product_id = 1;
-  int32 stock = 2;
+  int32 quantity = 2;
 }
 
 message UpdateProductStockResponse {
   bool success = 1;
   int32 new_stock = 2;
+}
+
+message CheckProductStockResponse {
+	int32 stock = 1;
 }

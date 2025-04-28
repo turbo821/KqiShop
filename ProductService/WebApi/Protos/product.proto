@@ -8,6 +8,7 @@ service ProductGrpc {
   rpc GetProduct (GetProductRequest) returns (GetProductResponse);
   rpc AddProduct (AddProductRequest) returns (AddProductResponse);
   rpc UpdateProductStock (UpdateProductStockRequest) returns (UpdateProductStockResponse);
+  rpc CheckProductStock (GetProductRequest) returns (CheckProductStockResponse);
 }
 
 message GetProductRequest {
@@ -42,4 +43,8 @@ message UpdateProductStockRequest {
 message UpdateProductStockResponse {
   bool success = 1;
   int32 new_stock = 2;
+}
+
+message CheckProductStockResponse {
+	int32 stock = 1;
 }

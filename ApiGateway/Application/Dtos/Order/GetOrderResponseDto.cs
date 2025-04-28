@@ -1,4 +1,5 @@
-﻿namespace ApiGateway.Dtos
+﻿
+namespace ApiGateway.Application.Dtos.Order
 {
     public record GetOrderResponseDto(
         int OrderId, 

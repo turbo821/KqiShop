@@ -9,5 +9,7 @@ namespace ProductService.Domain.Interfaces
         Task<int?> AddAsync(Product product);
 
         Task<int?> UpdateStockAsync(int productId, int stock);
+
+        Task<int?> GetStockAsync(int productId);
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Grpc.Core;
-using ApiGateway.Dtos;
-using OrderService.Client;
+using ApiGateway.Application.Dtos.Order;
+using Application.Interfaces;
 
 namespace ApiGateway
 {
@@ -21,26 +21,19 @@ namespace ApiGateway
                  .Produces<GetOrderResponseDto>()
                  .ProducesProblem(404)
                  .WithName(nameof(GetOrder));
+
         }
 
         private static async Task<IResult> CreateOrder(
             CreateOrderRequestDto request,
-            OrderGrpc.OrderGrpcClient client,
+            IOrderService orderService,
             ILogger<Program> logger)
         {
             try
             {
-                CreateOrderRequest order = new CreateOrderRequest 
-                { 
-                    OrderStatus = request.OrderStatus, 
-                    ProductId = request.ProductId, 
-                    Quantity = request.Quantity 
-                };
+                var response = await orderService.CreateOrderAsync(request);
 
-                var response = await client.CreateOrderAsync(order);
-
-                var dto = new CreateOrderResponseDto(response.OrderId, response.Success);
-                return TypedResults.Created(nameof(GetOrder), dto);
+                return TypedResults.Created(nameof(GetOrder), response);
             }
             catch (RpcException ex) when (ex.StatusCode == StatusCode.FailedPrecondition)
             {
@@ -51,19 +44,13 @@ namespace ApiGateway
 
         private static async Task<IResult> GetOrder(
             int id,
-            OrderGrpc.OrderGrpcClient client)
+            IOrderService orderService)
         {
             try
             {
-                var response = await client.GetOrderAsync(new GetOrderRequest { OrderId = id });
+                var response = await orderService.GetOrderAsync(id);
 
-                var dto = new GetOrderResponseDto(
-                    response.OrderId, response.Status, response.ProductId, 
-                    response.ProductName, response.ProductDescription, 
-                    response.Price, response.Quantity,
-                    response.CreatedAt.ToDateTime());
-
-                return TypedResults.Ok(dto);
+                return TypedResults.Ok(response);
             }
             catch (RpcException ex) when (ex.StatusCode == StatusCode.NotFound)
             {

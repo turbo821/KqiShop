@@ -33,11 +33,13 @@ namespace ProductService.Repositories
 
         public async Task<int?> UpdateStockAsync(int productId, int quantity)
         {
-            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == productId);
+            var product = await GetByIdAsync(productId);
 
-            if(product is null) return null;
+            if (product is null) return null;
 
             product.Stock += quantity;
+
+            if (product.Stock < 0) return null;
 
             var success = await _context.SaveChangesAsync();
 
@@ -45,9 +47,15 @@ namespace ProductService.Repositories
                 return product.Stock;
 
             return null;
-            
         }
 
+        public async Task<int?> GetStockAsync(int productId)
+        {
+            var product = await GetByIdAsync(productId);
 
+            if (product is null) return null;
+            
+            return product.Stock;
+        }
     }
 }

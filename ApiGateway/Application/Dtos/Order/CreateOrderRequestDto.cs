@@ -1,5 +1,5 @@
 ﻿
-namespace ApiGateway.Dtos
+namespace ApiGateway.Application.Dtos.Order
 {
     public record CreateOrderRequestDto(
         int ProductId,

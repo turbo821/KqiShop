@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "OrderService.Client";
+option csharp_namespace = "ApiGateway.Infrastructure.Protos";
 
 import "google/protobuf/timestamp.proto";
 
@@ -12,7 +12,6 @@ service OrderGrpc {
 }
 
 message CreateOrderRequest {
-  // repeated OrderItemDto items = 1;
   int32 product_id = 1;
   int32 quantity = 2;
   int32 order_status = 3;
@@ -35,14 +34,12 @@ message GetOrderRequest {
 message GetOrderResponse {
   int32 order_id = 1;
   int32 status = 2;
-  //repeated ProductDto products = 3;
   int32 product_id = 3;
   string product_name = 4;
   string product_description = 5;
   int32 quantity = 6;
   double price = 7;
   google.protobuf.Timestamp created_at = 8;
-  // double total_amount = 6;
 }
 
 message ProductDto {

@@ -1,5 +1,4 @@
-﻿using OrderService.Client;
-using ProductService.Client;
+﻿using ApiGateway.Infrastructure.Protos;
 
 namespace ApiGateway
 {

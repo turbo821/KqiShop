@@ -25,17 +25,25 @@ namespace OrderService.WebApi.Services
 
         public override async Task<CreateOrderResponse> CreateOrder(CreateOrderRequest request, ServerCallContext context)
         {
+            _logger.LogInformation("Starting order creation for product {ProductId}, quantity {Quantity}",
+                request.ProductId, request.Quantity);
+
             try
             {
+                _logger.LogDebug("Checking product availability...");
                 var product = await _productService.GetProductAsync(request.ProductId);
 
                 if (product.Stock < request.Quantity)
                 {
+                    _logger.LogWarning("Insufficient stock for product {ProductId}. Available: {AvailableStock}, Requested: {RequestedQuantity}",
+                        request.ProductId, product.Stock, request.Quantity);
+
                     throw new RpcException(new Status(
                         StatusCode.FailedPrecondition,
                         $"Not enough stock for product {request.ProductId}"));
                 }
 
+                _logger.LogDebug("Creating order entity...");
                 var order = new Order
                 {
                     CreatedAt = DateTime.UtcNow,
@@ -45,19 +53,24 @@ namespace OrderService.WebApi.Services
                 };
 
                 var orderId = await _orderRepository.AddAsync(order);
+                _logger.LogInformation("Order {OrderId} created successfully", orderId);
 
+                _logger.LogDebug("Reserving product stock...");
                 var reserveSuccess = await _productService.ReserveStockAsync(
                     request.ProductId,
                     request.Quantity);
 
                 if (!reserveSuccess)
                 {
+                    _logger.LogError("Failed to reserve stock for order {OrderId}", orderId);
                     await _orderRepository.UpdateStatusAsync(orderId, OrderStatus.Failed);
+
                     throw new RpcException(new Status(
-                        StatusCode.Aborted, 
+                        StatusCode.Aborted,
                         "Failed to reserve product"));
                 }
 
+                _logger.LogInformation("Order {OrderId} completed successfully", orderId);
                 return new CreateOrderResponse
                 {
                     OrderId = orderId,
@@ -66,35 +79,70 @@ namespace OrderService.WebApi.Services
             }
             catch (RpcException ex)
             {
-                _logger.LogError(ex, "Error creating order");
+                _logger.LogError(ex, "gRPC error creating order. Status: {StatusCode}, Detail: {Detail}",
+                    ex.StatusCode, ex.Status.Detail);
                 throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex, "Unexpected error creating order");
+                throw new RpcException(new Status(
+                    StatusCode.Internal,
+                    "Internal server error"));
             }
         }
 
         public override async Task<GetOrderResponse> GetOrder(GetOrderRequest request, ServerCallContext context)
         {
-            var order = await _orderRepository.GetByIdAsync(request.OrderId);
+            _logger.LogInformation("Fetching order {OrderId}", request.OrderId);
 
-            if (order == null)
+            try
             {
-                throw new RpcException(new Status(
-                    StatusCode.NotFound,
-                    $"Order with id {request.OrderId} not found"));
+                var order = await _orderRepository.GetByIdAsync(request.OrderId);
+
+                if (order == null)
+                {
+                    _logger.LogWarning("Order {OrderId} not found", request.OrderId);
+                    throw new RpcException(new Status(
+                        StatusCode.NotFound,
+                        $"Order with id {request.OrderId} not found"));
+                }
+
+                _logger.LogDebug("Fetching product details for order {OrderId}", order.Id);
+                var product = await _productService.GetProductAsync(order.ProductId);
+
+                _logger.LogDebug("Order details retrieved: {@Order}", new
+                {
+                    order.Id,
+                    order.Status,
+                    Product = product.Name
+                });
+
+                return new GetOrderResponse
+                {
+                    OrderId = order.Id,
+                    ProductId = order.ProductId,
+                    ProductName = product.Name,
+                    ProductDescription = product.Description,
+                    Price = product.Price,
+                    Quantity = order.Quantity,
+                    Status = ((int)order.Status),
+                    CreatedAt = Timestamp.FromDateTime(order.CreatedAt)
+                };
             }
-
-            var product = await _productService.GetProductAsync(order.ProductId);
-
-            return new GetOrderResponse
+            catch (RpcException ex)
             {
-                OrderId = order.Id,
-                ProductId = order.ProductId,
-                ProductName = product.Name,
-                ProductDescription = product.Description,
-                Price = product.Price,
-                Quantity = order.Quantity,
-                Status = ((int)order.Status),
-                CreatedAt = Timestamp.FromDateTime(order.CreatedAt)
-            };
+                _logger.LogError(ex, "Error fetching order {OrderId}. Status: {StatusCode}",
+                    request.OrderId, ex.StatusCode);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error fetching order {OrderId}", request.OrderId);
+                throw new RpcException(new Status(
+                    StatusCode.Internal,
+                    "Internal server error"));
+            }
         }
     }
 }
