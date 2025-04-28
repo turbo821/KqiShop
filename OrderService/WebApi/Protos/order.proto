@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+option csharp_namespace = "OrderService.WebApi.Protos";
+
+import "google/protobuf/timestamp.proto";
+
+package order;
+
+service OrderGrpc {
+  rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse);
+  rpc GetOrder (GetOrderRequest) returns (GetOrderResponse);
+}
+
+message CreateOrderRequest {
+  int32 product_id = 1;
+  int32 quantity = 2;
+  int32 order_status = 3;
+}
+
+message OrderItemDto {
+  int32 product_id = 1;
+  int32 quantity = 2;
+}
+
+message CreateOrderResponse {
+  int32 order_id = 1;
+  bool success = 2;
+}
+
+message GetOrderRequest {
+  int32 order_id = 1;
+}
+
+message GetOrderResponse {
+  int32 order_id = 1;
+  int32 status = 2;
+  int32 product_id = 3;
+  string product_name = 4;
+  string product_description = 5;
+  int32 quantity = 6;
+  double price = 7;
+  google.protobuf.Timestamp created_at = 8;
+}
+
+message ProductDto {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  double quantity = 4;
+  double total_amount = 5;
+}
