@@ -1,0 +1,66 @@
+services:
+  product-service:
+    image: ${DOCKER_REGISTRY-}productservice
+    build:
+      context: ./ProductService
+      dockerfile: WebApi/Dockerfile
+    ports:
+      - "5076:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - CONNECTION_STRING=Host=product-db;Database=product_service;Username=postgres;Password=postgres
+    depends_on:
+      - product-db
+
+  order-service:
+    image: ${DOCKER_REGISTRY-}orderservice
+    build:
+      context: ./OrderService
+      dockerfile: WebApi/Dockerfile
+    ports:
+      - "5027:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - CONNECTION_STRING=Host=order-db;Database=order_service;Username=postgres;Password=postgres
+      - ProductServiceUrl=http://product-service:8080
+    depends_on:
+      - order-db
+
+  api-gateway:
+    image: ${DOCKER_REGISTRY-}apigateway
+    build:
+      context: ./ApiGateway
+      dockerfile: WebApi/Dockerfile
+    ports:
+      - "5000:8080"
+    depends_on:
+      - product-service
+      - order-service
+    environment:
+      - ProductServiceUrl=http://product-service:8080
+      - OrderServiceUrl=http://order-service:8080
+
+  product-db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: product_service
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./product-data:/var/lib/postgresql/data
+      - ./product_service.sql:/docker-entrypoint-initdb.d/product_service_dump.sql
+
+  order-db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: order_service
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./order-data:/var/lib/postgresql/data
+      - ./order_service.sql:/docker-entrypoint-initdb.d/order_service_dump.sql
+
