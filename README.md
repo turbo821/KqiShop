@@ -22,11 +22,16 @@ In WebApi/appsettings.json files (ProductService and OrderService) establish con
 
 Run three projects (ProductService, OrderService, ApiGateway) with http profiles in Visual Studio
 
+http://localhost:5292/swagger
+
 ### 2. Run using docker compose
 
 `docker-compose up`
+
+http://localhost:5000/swagger
 
 ### 3. Run using docker compose with loading images from docker hub
 
 `docker-compose -f ./docker-compose-with-images.yml up`
 
+http://localhost:5000/swagger
