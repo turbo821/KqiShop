@@ -1,9 +1,6 @@
 services:
   product-service:
-    image: ${DOCKER_REGISTRY-}productservice
-    build:
-      context: ./ProductService
-      dockerfile: WebApi/Dockerfile
+    image: turbo821/kqishop-product-service:04-30
     ports:
       - "5076:8080"
     environment:
@@ -13,10 +10,7 @@ services:
       - product-db
 
   order-service:
-    image: ${DOCKER_REGISTRY-}orderservice
-    build:
-      context: ./OrderService
-      dockerfile: WebApi/Dockerfile
+    image: turbo821/kqishop-order-service:04-30
     ports:
       - "5027:8080"
     environment:
@@ -27,10 +21,7 @@ services:
       - order-db
 
   api-gateway:
-    image: ${DOCKER_REGISTRY-}apigateway
-    build:
-      context: ./ApiGateway
-      dockerfile: WebApi/Dockerfile
+    image: turbo821/kqishop-api-gateway:04-30
     ports:
       - "5000:8080"
     depends_on:
