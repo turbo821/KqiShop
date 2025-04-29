@@ -28,6 +28,14 @@ namespace OrderService.WebApi.Services
             _logger.LogInformation("Starting order creation for product {ProductId}, quantity {Quantity}",
                 request.ProductId, request.Quantity);
 
+            if (request.Quantity < 0)
+            {
+                _logger.LogWarning("Attempt to create order with negative quantity: {Quantity}", request.Quantity);
+                throw new RpcException(new Status(
+                    StatusCode.InvalidArgument,
+                    "Quantity cannot be negative"));
+            }
+
             try
             {
                 _logger.LogDebug("Checking product availability...");
