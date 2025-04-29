@@ -20,18 +20,26 @@ Create databases:
 
 In WebApi/appsettings.json files (ProductService and OrderService) establish connection to DBs "ConnectionStrings:DefaultConnection"
 
-Run three projects (ProductService, OrderService, ApiGateway) with http profiles in Visual Studio
+Visual Studio: run three projects (ProductService, OrderService, ApiGateway) with http profiles
 
-http://localhost:5292/swagger
+VS Code: in three different terminals execute commands:
+
+`dotnet run --project .\ProductService\WebApi\WebApi.csproj --profile http`
+
+`dotnet run --project .\OrderService\WebApi\WebApi.csproj --profile http`
+
+`dotnet run --project .\ApiGateway\WebApi\WebApi.csproj --profile http`
+
+Address: http://localhost:5292/swagger
 
 ### 2. Run using docker compose
 
 `docker-compose up`
 
-http://localhost:5000/swagger
+Address: http://localhost:5000/swagger
 
 ### 3. Run using docker compose with loading images from docker hub
 
 `docker-compose -f ./docker-compose-with-images.yml up`
 
-http://localhost:5000/swagger
+Address: http://localhost:5000/swagger
